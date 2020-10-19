@@ -22,7 +22,7 @@ static void do_read(int fd, int len)
 	/* read at least 2 bytes, no more than 32 */
 	if (len < 2)
 		len = 2;
-	else if (len > sizeof(buf))
+	else if (len > (int)sizeof(buf))
 		len = sizeof(buf);
 	memset(buf, 0, sizeof buf);
 
@@ -54,7 +54,7 @@ static void do_msg(int fd, int len)
 	memset(xfer, 0, sizeof xfer);
 	memset(buf, 0, sizeof buf);
 
-	if (len > sizeof buf)
+	if (len > (int) sizeof buf)
 		len = sizeof buf;
 
 	buf[0] = 0xaa;
@@ -80,24 +80,27 @@ static void dumpstat(const char *name, int fd)
 {
 	__u8	lsb, bits;
 	__u32	mode, speed;
-
+	printf("1\n");
 	if (ioctl(fd, SPI_IOC_RD_MODE32, &mode) < 0) {
 		perror("SPI rd_mode");
 		return;
 	}
+	printf("2\n");
 	if (ioctl(fd, SPI_IOC_RD_LSB_FIRST, &lsb) < 0) {
 		perror("SPI rd_lsb_fist");
 		return;
 	}
+	printf("3\n");
 	if (ioctl(fd, SPI_IOC_RD_BITS_PER_WORD, &bits) < 0) {
 		perror("SPI bits_per_word");
 		return;
 	}
+	printf("4\n");
 	if (ioctl(fd, SPI_IOC_RD_MAX_SPEED_HZ, &speed) < 0) {
 		perror("SPI max_speed_hz");
 		return;
 	}
-
+	printf("5\n");
 	printf("%s: spi mode 0x%x, %d bits %sper word, %d Hz max\n",
 		name, mode, bits, lsb ? "(lsb first) " : "", speed);
 }
@@ -110,6 +113,7 @@ int main(int argc, char **argv)
 	int		fd;
 	const char	*name;
 
+	printf("1\n");
 	while ((c = getopt(argc, argv, "hm:r:v")) != EOF) {
 		switch (c) {
 		case 'm':
@@ -134,19 +138,19 @@ usage:
 			return 1;
 		}
 	}
-
+	printf("2\n");
 	if ((optind + 1) != argc)
 		goto usage;
 	name = argv[optind];
-
+	printf("3\n");
 	fd = open(name, O_RDWR);
 	if (fd < 0) {
 		perror("open");
 		return 1;
 	}
-
+	printf("4\n");
 	dumpstat(name, fd);
-
+	printf("5\n");
 	if (msglen)
 		do_msg(fd, msglen);
 
